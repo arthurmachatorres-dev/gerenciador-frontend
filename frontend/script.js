@@ -1,5 +1,5 @@
 // URL do backend online
-const API = 'https://gerenciador-frontend-m9yp.onrender.com'; 
+const API = 'https://gerenciador-x91g.onrender.com'; 
 
 // função para formatar data que vem como "YYYY-MM-DD" para "DD/MM/YYYY"
 function formatarDataBR(isoDate) {
