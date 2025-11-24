@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shirlei Contas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-bg"></div>
+
+  <div class="container">
+    <header>
+      <div class="logo-area">
+        <div class="logo-badge">is</div>
+        <div>
+          <h1>Shirlei Contas 🦋</h1>
+          <p class="subtitle">Feito para a mais linda do mundo!!</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="monthrow">
+        <label>Mês
+          <select id="mes"></select>
+        </label>
+        <label>Ano
+          <input id="ano" type="number" />
+        </label>
+        <label>Salário
+          <input id="salario" type="number" step="0.01" placeholder="0,00" />
+        </label>
+        <button id="btnSalvarSalario" class="btn btn-primary">
+          💾 Salvar salário
+        </button>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-item">
+          <span>Total de contas</span>
+          <strong>R$ <span id="totalContas">0.00</span></strong>
+        </div>
+        <div class="summary-item positive">
+          <span>Pagas</span>
+          <strong>R$ <span id="contasPagas">0.00</span></strong>
+        </div>
+        <div class="summary-item warning">
+          <span>Pendentes</span>
+          <strong>R$ <span id="contasPendentes">0.00</span></strong>
+        </div>
+        <div class="summary-item balance">
+          <span>Saldo final</span>
+          <strong>R$ <span id="saldoFinal">0.00</span></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="form">
+      <div class="section-header">
+        <h2>Adicionar conta</h2>
+        <p>Informe os dados da conta para adicionar ao mês selecionado.</p>
+      </div>
+      <div class="formrow">
+        <input id="nomeConta" placeholder="Nome (ex: Conta de luz)" />
+        <input id="tipoConta" placeholder="Tipo (Cartão, Assinatura, etc.)" />
+        <input id="valorConta" type="number" step="0.01" placeholder="Valor R$" />
+        <input id="vencimentoConta" type="date" />
+        <button id="btnSalvarConta" class="btn btn-primary">
+          ➕ Adicionar
+        </button>
+      </div>
+    </section>
+
+    <section class="lista">
+      <div class="section-header">
+        <h2>Contas do mês</h2>
+        <p>Veja, edite, marque como paga ou exclua qualquer conta.</p>
+      </div>
+      <ul id="listaContas" class="list"></ul>
+    </section>
+
+    <footer>
+      <small>Eu te amo!! ♥ </small>
+    </footer>
+  </div>
+
+  <!-- MODAL DE EDIÇÃO -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Editar conta</h3>
+        <button id="btnFecharModal" class="btn-icon" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <label>
+          Nome
+          <input id="editNomeConta" type="text" />
+        </label>
+        <label>
+          Tipo
+          <input id="editTipoConta" type="text" />
+        </label>
+        <label>
+          Valor (R$)
+          <input id="editValorConta" type="number" step="0.01" />
+        </label>
+        <label>
+          Vencimento
+          <input id="editVencimentoConta" type="date" />
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnCancelarEdicao" class="btn btn-ghost">Cancelar</button>
+        <button id="btnSalvarEdicao" class="btn btn-primary">💾 Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
