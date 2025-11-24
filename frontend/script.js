@@ -1,5 +1,5 @@
 // URL do backend online
-const API = 'https://gerenciador-backend.onrender.com'; // substitua pelo link real do seu backend no Render
+const API = 'https://gerenciador-frontend-m9yp.onrender.com'; 
 
 // função para formatar data que vem como "YYYY-MM-DD" para "DD/MM/YYYY"
 function formatarDataBR(isoDate) {
@@ -52,7 +52,7 @@ function fecharModal() {
   editVencimentoConta.value = '';
 }
 
-// salário
+// ---------- SALÁRIO ----------
 async function carregarSalario() {
   const mes = document.getElementById('mes').value;
   const ano = document.getElementById('ano').value;
@@ -73,7 +73,7 @@ btnSalvarSalario.addEventListener('click', async () => {
   carregarResumo();
 });
 
-// ---------- CRIAR CONTA ----------
+// ---------- CONTAS ----------
 async function salvarConta() {
   const mes = document.getElementById('mes').value;
   const ano = document.getElementById('ano').value;
@@ -87,16 +87,7 @@ async function salvarConta() {
     return;
   }
 
-  const payload = {
-    nome,
-    tipo,
-    tipo_conta: tipo,
-    valor,
-    data_vencimento,
-    vencimento: data_vencimento,
-    mes,
-    ano
-  };
+  const payload = { nome, tipo, valor, data_vencimento, mes, ano };
 
   await fetch(`${API}/contas`, {
     method: 'POST',
@@ -125,9 +116,8 @@ async function listarContas() {
   lista.innerHTML = '';
 
   contas.forEach(c => {
-    const tipo = c.tipo ?? c.tipo_conta ?? '';
-    const vencRaw = c.data_vencimento ?? c.vencimento ?? '';
-    const vencimento = vencRaw ? formatarDataBR(vencRaw) : '';
+    const tipo = c.tipo ?? '';
+    const vencimento = c.data_vencimento ? formatarDataBR(c.data_vencimento) : '';
 
     const li = document.createElement('li');
     if (c.status === 'PAGO') li.classList.add('pago');
@@ -135,17 +125,13 @@ async function listarContas() {
     li.innerHTML = `
       <div class="info">
         <strong>${c.nome}</strong>
-        <div class="meta">
-          ${tipo || 'Sem tipo'} • ${vencimento || 'Sem vencimento'}
-        </div>
+        <div class="meta">${tipo || 'Sem tipo'} • ${vencimento || 'Sem vencimento'}</div>
       </div>
       <div class="value-actions">
         <div class="value">R$ ${Number(c.valor).toFixed(2)}</div>
         <div class="actions">
           <button onclick="editarConta(${c.id})">✏️ Editar</button>
-          <button onclick="pagarConta(${c.id})">
-            ${c.status === 'PAGO' ? '✅ Desmarcar' : '💸 Pago'}
-          </button>
+          <button onclick="pagarConta(${c.id})">${c.status === 'PAGO' ? '✅ Desmarcar' : '💸 Pago'}</button>
           <button onclick="excluirConta(${c.id})">🗑 Excluir</button>
         </div>
       </div>
@@ -154,7 +140,7 @@ async function listarContas() {
   });
 }
 
-// ---------- EDITAR (abrir modal) ----------
+// ---------- EDITAR ----------
 window.editarConta = async function (id) {
   const mes = document.getElementById('mes').value;
   const ano = document.getElementById('ano').value;
@@ -164,44 +150,25 @@ window.editarConta = async function (id) {
   if (!c) return;
 
   contaEmEdicao = id;
-  const tipo = c.tipo ?? c.tipo_conta ?? '';
-  const vencimento = c.data_vencimento ?? c.vencimento ?? '';
-
   editNomeConta.value = c.nome;
-  editTipoConta.value = tipo;
+  editTipoConta.value = c.tipo ?? '';
   editValorConta.value = c.valor;
-  editVencimentoConta.value = vencimento || '';
+  editVencimentoConta.value = c.data_vencimento || '';
 
   abrirModal();
 };
 
-// ---------- EDITAR (salvar modal) ----------
 async function salvarEdicaoModal() {
-  if (!contaEmEdicao) {
-    fecharModal();
-    return;
-  }
+  if (!contaEmEdicao) return fecharModal();
 
   const mes = document.getElementById('mes').value;
   const ano = document.getElementById('ano').value;
 
-  const nome = editNomeConta.value.trim();
-  const tipo = editTipoConta.value.trim();
-  const valor = Number(editValorConta.value || 0);
-  const data_vencimento = editVencimentoConta.value || null;
-
-  if (!nome || !valor) {
-    alert('Preencha pelo menos o nome e o valor da conta.');
-    return;
-  }
-
   const payload = {
-    nome,
-    tipo,
-    tipo_conta: tipo,
-    valor,
-    data_vencimento,
-    vencimento: data_vencimento,
+    nome: editNomeConta.value.trim(),
+    tipo: editTipoConta.value.trim(),
+    valor: Number(editValorConta.value || 0),
+    data_vencimento: editVencimentoConta.value || null,
     mes,
     ano
   };
@@ -219,17 +186,10 @@ async function salvarEdicaoModal() {
 
 // ---------- PAGAR / DESMARCAR ----------
 window.pagarConta = async function (id) {
-  const mes = document.getElementById('mes').value;
-  const ano = document.getElementById('ano').value;
-  const res = await fetch(`${API}/contas/${mes}/${ano}`);
-  const contas = await res.json();
-  const c = contas.find(x => x.id === id);
-  if (!c) return;
-  const novoStatus = c.status === 'PAGO' ? 'PENDENTE' : 'PAGO';
-  await fetch(`${API}/contas/${id}/status`, {
+  const res = await fetch(`${API}/contas/${id}/status`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: novoStatus })
+    body: JSON.stringify({ status: 'PAGO' }) // alterna com backend
   });
   listarContas();
   carregarResumo();
@@ -238,9 +198,7 @@ window.pagarConta = async function (id) {
 // ---------- EXCLUIR ----------
 window.excluirConta = async function (id) {
   if (!confirm('Tem certeza que deseja excluir esta conta?')) return;
-  await fetch(`${API}/contas/${id}`, {
-    method: 'DELETE'
-  });
+  await fetch(`${API}/contas/${id}`, { method: 'DELETE' });
   listarContas();
   carregarResumo();
 };
@@ -251,29 +209,26 @@ async function carregarResumo() {
   const ano = document.getElementById('ano').value;
   const res = await fetch(`${API}/resumo/${mes}/${ano}`);
   const dados = await res.json();
+
   document.getElementById('totalContas').innerText = Number(dados.total_contas || 0).toFixed(2);
   document.getElementById('contasPagas').innerText = Number(dados.pagos || 0).toFixed(2);
   document.getElementById('contasPendentes').innerText = Number(dados.pendentes || 0).toFixed(2);
   document.getElementById('saldoFinal').innerText = Number(dados.saldo_final || 0).toFixed(2);
 }
 
-// eventos do modal
+// ---------- EVENTOS ----------
 btnFecharModal.addEventListener('click', fecharModal);
 btnCancelarEdicao.addEventListener('click', fecharModal);
 btnSalvarEdicao.addEventListener('click', salvarEdicaoModal);
 
-// fechar modal ao clicar fora
 modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) {
-    fecharModal();
-  }
+  if (e.target === modalOverlay) fecharModal();
 });
 
-// troca de mês/ano
 mesSelect.addEventListener('change', () => { listarContas(); carregarResumo(); });
 document.getElementById('ano').addEventListener('change', () => { listarContas(); carregarResumo(); });
 
-// init
+// ---------- INIT ----------
 carregarSalario();
 listarContas();
 carregarResumo();
