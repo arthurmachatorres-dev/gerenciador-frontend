@@ -1,4 +1,5 @@
-const API = 'http://localhost:4001';
+// URL do backend online
+const API = 'https://gerenciador-backend.onrender.com'; // substitua pelo link real do seu backend no Render
 
 // função para formatar data que vem como "YYYY-MM-DD" para "DD/MM/YYYY"
 function formatarDataBR(isoDate) {
@@ -124,15 +125,12 @@ async function listarContas() {
   lista.innerHTML = '';
 
   contas.forEach(c => {
-    // tenta vários possíveis nomes de campos
     const tipo = c.tipo ?? c.tipo_conta ?? '';
     const vencRaw = c.data_vencimento ?? c.vencimento ?? '';
     const vencimento = vencRaw ? formatarDataBR(vencRaw) : '';
 
     const li = document.createElement('li');
-    if (c.status === 'PAGO') {
-      li.classList.add('pago');
-    }
+    if (c.status === 'PAGO') li.classList.add('pago');
 
     li.innerHTML = `
       <div class="info">
@@ -166,14 +164,12 @@ window.editarConta = async function (id) {
   if (!c) return;
 
   contaEmEdicao = id;
-
   const tipo = c.tipo ?? c.tipo_conta ?? '';
   const vencimento = c.data_vencimento ?? c.vencimento ?? '';
 
   editNomeConta.value = c.nome;
   editTipoConta.value = tipo;
   editValorConta.value = c.valor;
-  // aqui mantemos o formato ISO para o input type="date"
   editVencimentoConta.value = vencimento || '';
 
   abrirModal();
